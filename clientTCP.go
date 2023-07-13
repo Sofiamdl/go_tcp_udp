@@ -31,9 +31,6 @@ func ClientTCP(i string) {
 		}
 	}(conn)
 
-	//var mensagem string
-	//fmt.Println("Digite sua mensagem por favor")
-
 	req := i
 
 	_, err = fmt.Fprintf(conn, req+"\n")
