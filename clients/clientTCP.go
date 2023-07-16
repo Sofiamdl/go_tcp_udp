@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 )
 
 var (
 	names = []string{"Sofia", "Alex", "Felipo", "Elaine", "Aline", "Matheus"}
 )
 
-func ClientTCP(i string) {
+func ClientTCP(client string, sampleSize int) {
 
 	r, err := net.ResolveTCPAddr("tcp", "localhost:1313")
 	if err != nil {
@@ -31,25 +32,31 @@ func ClientTCP(i string) {
 		}
 	}(conn)
 
-	req := i
+	for i := 0; i < sampleSize; i++ {
 
-	_, err = fmt.Fprintf(conn, req+"\n")
-	if err != nil {
-		fmt.Println(err)
+		req := client
+
+		_, err = fmt.Fprintf(conn, req+"\n")
+		if err != nil {
+			fmt.Println(err)
+		}
+		t1 := time.Now()
+		rep, err := bufio.NewReader(conn).ReadString('\n')
+
+		fmt.Println(time.Now().Sub(t1).Microseconds())
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Print(req, " ", rep)
 	}
-
-	rep, err := bufio.NewReader(conn).ReadString('\n')
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Print(req, " ", rep)
 
 }
 
 func main() {
 	n := 6
+	sampleSize := 10
 	for i := 0; i < n; i++ {
-		ClientTCP(names[i])
+		ClientTCP(names[i], sampleSize)
 	}
 }
