@@ -3,13 +3,27 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"time"
 )
 
 var (
-	names = []string{"Sofia", "Alex", "Felipo", "Elaine", "Aline", "Matheus"}
+	names = []string{"Sofia", "Alex", "Felipo", "Elaine", "Aline", "Matheus", "Miguel",
+		"Davi",
+		"Gabriel",
+		"Arthur",
+		"Lucas",
+		"Matheus",
+		"Pedro",
+		"Guilherme",
+		"Gustavo",
+		"Rafael",
+		"Felipe",
+		"Bernardo",
+		"Enzo",
+		"Nicolas"}
 )
 
 func ClientTCP(client string, sampleSize int) {
@@ -36,27 +50,27 @@ func ClientTCP(client string, sampleSize int) {
 
 		req := client
 
+		t1 := time.Now()
 		_, err = fmt.Fprintf(conn, req+"\n")
 		if err != nil {
 			fmt.Println(err)
 		}
-		t1 := time.Now()
-		rep, err := bufio.NewReader(conn).ReadString('\n')
 
+		_, err := bufio.NewReader(conn).ReadString('\n')
 		fmt.Println(time.Now().Sub(t1).Microseconds())
+
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		fmt.Print(req, " ", rep)
+		//Name print
+		//fmt.Print(req, " ", rep)
 	}
 
 }
 
 func main() {
-	n := 6
-	sampleSize := 10
-	for i := 0; i < n; i++ {
-		ClientTCP(names[i], sampleSize)
-	}
+	randNum := rand.Intn(20)
+	sampleSize := 10000
+	ClientTCP(names[randNum], sampleSize)
 }
