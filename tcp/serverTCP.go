@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 )
 
@@ -10,33 +12,48 @@ var (
 	dict map[string]string
 )
 
-func udpServer() {
-	req := make([]byte, 1024)
+func HandleConnection(conn net.Conn) {
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(0)
+		}
+	}(conn)
+	for {
+		req, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		_, err = conn.Write([]byte(TransformName(req) + "\n"))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+}
 
-	addr, err := net.ResolveUDPAddr("udp", "localhost:1313")
+func ServerTCP() {
+	r, err := net.ResolveTCPAddr("tcp", "localhost:1313")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	conn, err := net.ListenUDP("udp", addr)
+	ln, err := net.ListenTCP("tcp", r)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println("Servidor UDP aguardando requests...")
+	fmt.Println("Servidor aguardando conexão...")
 
 	for {
-		_, addr, err := conn.ReadFromUDP(req)
+		conn, err := ln.Accept()
 		if err != nil {
 			fmt.Println(err)
 		}
-
-		_, err = conn.WriteTo([]byte(TransformName(string(req))), addr)
-		if err != nil {
-			fmt.Println(err)
-		}
+		go HandleConnection(conn)
 	}
-
 }
 
 func TransformName(name string) string {
@@ -85,5 +102,5 @@ func makeDic() map[string]string {
 
 func main() {
 	dict = makeDic()
-	udpServer()
+	ServerTCP()
 }
