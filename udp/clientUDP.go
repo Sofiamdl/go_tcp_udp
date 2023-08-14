@@ -57,10 +57,6 @@ func udpClient(client string, sampleSize int) {
 		t1 := time.Now()
 		_, err = conn.Write(req)
 
-		if err != nil {
-			fmt.Println(err)
-		}
-
 		_, _, err = conn.ReadFromUDP(rep)
 		fmt.Println(time.Now().Sub(t1).Microseconds())
 

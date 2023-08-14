@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
 	"net"
 	"os"
 	"time"
@@ -70,7 +69,7 @@ func ClientTCP(client string, sampleSize int) {
 }
 
 func main() {
-	randNum := rand.Intn(20)
+	// randNum := rand.Intn(20)
 	sampleSize := 10000
-	ClientTCP(names[randNum], sampleSize)
+	ClientTCP("Sofia", sampleSize)
 }
