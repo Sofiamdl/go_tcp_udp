@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"log"
 	"time"
@@ -44,18 +45,26 @@ func main() {
 		case <-ctx.Done():
 			return
 		default:
-			body := "chico fumaca"
+			now := time.Now()
+			data := map[string]interface{}{
+				"name":     "chico fumaca",
+				"sentTime": now.Format(time.RFC3339), // format timestamp as string
+			}
+
+			jsonData, err := json.Marshal(data)
+			failOnError(err, "Failed to marshal JSON")
+
 			err = ch.PublishWithContext(ctx,
 				"",     // exchange
 				q.Name, // routing key
 				false,  // mandatory
 				false,  // immediate
 				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:        []byte(body),
+					ContentType: "application/json", // Use JSON content type
+					Body:        jsonData,
 				})
 			failOnError(err, "Failed to publish a message")
-			log.Printf("📤 nome \"%s\" enviado!\n", body)
+			log.Printf("📤 nome \"%s\" enviado - \"%s\"!\n", data["name"], data["sentTime"])
 
 			exec++
 		}

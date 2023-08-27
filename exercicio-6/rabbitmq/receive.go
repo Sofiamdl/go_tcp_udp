@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -59,6 +60,11 @@ func failOnError(err error, msg string) {
 	}
 }
 
+type Message struct {
+	Name     string `json:"name"`
+	SentTime string `json:"sentTime"`
+}
+
 func main() {
 	startTime := time.Now()
 
@@ -100,17 +106,25 @@ func main() {
 			log.Printf("🌀-%d aguardando nomes", id)
 
 			for d := range msgs {
-				ninjaName := TransformName(string(d.Body))
-				log.Printf("🥷-%d: \"olá, %s!\"", id, ninjaName)
+				var message Message
+				err := json.Unmarshal(d.Body, &message)
+				failOnError(err, "Failed to decode the JSON message")
+
+				ninjaName := TransformName(message.Name)
+				timestamp, err := time.Parse(time.RFC3339, message.SentTime)
+				failOnError(err, "Failed to parse the message sent time")
+
+				elapsedTime := time.Now().Sub(timestamp).Milliseconds()
+				log.Printf("🥷-%d: \"olá, %s! você enviou uma mensagem %d ms atrás\"", id, ninjaName, elapsedTime)
+				fmt.Println(elapsedTime)
 				executionsWaitGroup.Done()
 			}
 		}(i)
 	}
 	executionsWaitGroup.Wait()
 
-	elapsedTime := time.Now().Sub(startTime).Microseconds()
-	// log.Printf("Tempo total: %s", elapsedTime)
-	fmt.Println(elapsedTime)
+	totalElapsedTime := time.Now().Sub(startTime).Microseconds()
+	log.Printf("Tempo total: %d ms", totalElapsedTime)
 }
 
 var consumersQuant int
