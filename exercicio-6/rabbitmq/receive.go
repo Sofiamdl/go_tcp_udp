@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"strings"
 
@@ -75,7 +76,6 @@ func main() {
 	failOnError(err, "Failed to declare a queue")
 
 	// inicializa os consumidores
-	consumersQuant := 3
 	for i := 0; i < consumersQuant; i++ {
 		go func(id int) {
 			msgs, err := ch.Consume(
@@ -89,7 +89,7 @@ func main() {
 			)
 			failOnError(err, "Failed to register a consumer")
 
-			log.Printf("🌀-%d aguardando nomes. para sair aperte CTRL+C", id)
+			log.Printf("🌀-%d aguardando nomes", id)
 
 			for d := range msgs {
 				ninjaName := TransformName(string(d.Body))
@@ -100,4 +100,11 @@ func main() {
 
 	var forever chan struct{}
 	<-forever
+}
+
+var consumersQuant int
+
+func init() {
+	flag.IntVar(&consumersQuant, "consumers", 1, "number of consumers")
+	flag.Parse()
 }

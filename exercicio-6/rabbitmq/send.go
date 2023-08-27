@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"time"
 
@@ -36,16 +37,35 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	body := "chico fumaca"
-	err = ch.PublishWithContext(ctx,
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		})
-	failOnError(err, "Failed to publish a message")
-	log.Printf(" [x] Sent %s\n", body)
+	exec := 0
+
+	for exec < execQuant {
+		select {
+		case <-ctx.Done():
+			log.Printf("🚫 fim das execucoes!")
+			return
+		default:
+			body := "chico fumaca"
+			err = ch.PublishWithContext(ctx,
+				"",     // exchange
+				q.Name, // routing key
+				false,  // mandatory
+				false,  // immediate
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        []byte(body),
+				})
+			failOnError(err, "Failed to publish a message")
+			log.Printf("📤 nome \"%s\" enviado!\n", body)
+
+			exec++
+		}
+	}
+}
+
+var execQuant int
+
+func init() {
+	flag.IntVar(&execQuant, "executions", 10000, "number of executions")
+	flag.Parse()
 }
