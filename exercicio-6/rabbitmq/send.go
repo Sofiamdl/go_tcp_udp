@@ -42,7 +42,6 @@ func main() {
 	for exec < execQuant {
 		select {
 		case <-ctx.Done():
-			log.Printf("🚫 fim das execucoes!")
 			return
 		default:
 			body := "chico fumaca"

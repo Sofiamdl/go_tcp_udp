@@ -2,8 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"strings"
+	"sync"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -57,6 +60,8 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
+	startTime := time.Now()
+
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -74,6 +79,9 @@ func main() {
 		nil,                // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+
+	var executionsWaitGroup sync.WaitGroup
+	executionsWaitGroup.Add(execQuant)
 
 	// inicializa os consumidores
 	for i := 0; i < consumersQuant; i++ {
@@ -94,17 +102,22 @@ func main() {
 			for d := range msgs {
 				ninjaName := TransformName(string(d.Body))
 				log.Printf("🥷-%d: \"olá, %s!\"", id, ninjaName)
+				executionsWaitGroup.Done()
 			}
 		}(i)
 	}
+	executionsWaitGroup.Wait()
 
-	var forever chan struct{}
-	<-forever
+	elapsedTime := time.Now().Sub(startTime).Microseconds()
+	// log.Printf("Tempo total: %s", elapsedTime)
+	fmt.Println(elapsedTime)
 }
 
 var consumersQuant int
+var execQuant int
 
 func init() {
 	flag.IntVar(&consumersQuant, "consumers", 1, "number of consumers")
+	flag.IntVar(&execQuant, "executions", 1, "number of executions")
 	flag.Parse()
 }
