@@ -90,7 +90,7 @@ func main() {
 	)
 	failOnError(err, "Failed to register a consumer")
 
-	log.Printf("🥷servidor aguardando nomes🥷")
+	// log.Printf("🥷servidor aguardando nomes🥷")
 
 	for d := range msgs {
 		var request Message
