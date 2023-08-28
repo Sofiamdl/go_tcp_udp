@@ -50,7 +50,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 10000; i++ {
 		timesArray[i] = time.Now()
 
 		msg, err := json.Marshal(Message{Name: "sofia", Id: i, Time: time.Now()})
