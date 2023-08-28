@@ -23,6 +23,7 @@ type Message struct {
 const qosClient = 1
 
 func main() {
+	startTime := time.Now()
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker("mqtt://localhost:1883")
 	opts.SetClientID("cliente")
@@ -57,6 +58,8 @@ func main() {
 		fmt.Printf("Mensagem Publicada: %s\n", msg)
 		time.Sleep(time.Second)
 	}
+	elapsedTime := time.Now().Sub(startTime).Milliseconds()
+	fmt.Println(elapsedTime)
 }
 
 var receiveHandlerClient MQTT.MessageHandler = func(c MQTT.Client, m MQTT.Message) {
