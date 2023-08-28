@@ -61,7 +61,6 @@ func failOnError(err error, msg string) {
 
 type Message struct {
 	Name string    `json:"name"`
-	Id   int       `json:"id"`
 	Time time.Time `json:"time"`
 }
 
@@ -102,7 +101,6 @@ var receiveHandler MQTT.MessageHandler = func(c MQTT.Client, m MQTT.Message) {
 	ninjaName := TransformName(request.Name)
 	response := Message{
 		Name: ninjaName,
-		Id:   request.Id,
 		Time: request.Time,
 	}
 	responseJson, err := json.Marshal(response)

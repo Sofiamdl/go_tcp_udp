@@ -18,13 +18,10 @@ func failOnError(err error, msg string) {
 
 type Message struct {
 	Name string    `json:"name"`
-	Id   int       `json:"id"`
 	Time time.Time `json:"time"`
 }
 
 var startTime time.Time
-
-var timesArray [200]time.Time
 
 const qosClient = 1
 
@@ -51,9 +48,8 @@ func main() {
 	}
 
 	for i := 0; i < 10000; i++ {
-		timesArray[i] = time.Now()
 
-		msg, err := json.Marshal(Message{Name: "sofia", Id: i, Time: time.Now()})
+		msg, err := json.Marshal(Message{Name: "sofia", Time: time.Now()})
 		failOnError(err, "Failed to parse the JSON message")
 
 		token := client.Publish("request", qosClient, false, msg)
