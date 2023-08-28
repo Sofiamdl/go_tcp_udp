@@ -80,7 +80,7 @@ func main() {
 		failOnError(err, "Failed to decode the JSON message")
 
 		// log.Printf("olá %s! seu nome ninja é 🌀%s🌀", request.Name, reply.Name)
-		elapsedTime := time.Now().Sub(startTime).Milliseconds()
+		elapsedTime := time.Now().Sub(startTime).Nanoseconds()
 		fmt.Println(elapsedTime)
 	}
 }
