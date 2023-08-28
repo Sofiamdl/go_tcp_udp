@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -59,7 +60,9 @@ func failOnError(err error, msg string) {
 }
 
 type Message struct {
-	Name string `json:"name"`
+	Name string    `json:"name"`
+	Id   int       `json:"id"`
+	Time time.Time `json:"time"`
 }
 
 const qos = 1
@@ -87,7 +90,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Printf("🥷servidor aguardando nomes🥷")
+	// log.Printf("🥷servidor aguardando nomes🥷")
 	fmt.Scanln()
 }
 
@@ -99,6 +102,8 @@ var receiveHandler MQTT.MessageHandler = func(c MQTT.Client, m MQTT.Message) {
 	ninjaName := TransformName(request.Name)
 	response := Message{
 		Name: ninjaName,
+		Id:   request.Id,
+		Time: request.Time,
 	}
 	responseJson, err := json.Marshal(response)
 	failOnError(err, "Failed to parse the JSON message")

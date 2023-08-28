@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,13 +17,18 @@ func failOnError(err error, msg string) {
 }
 
 type Message struct {
-	Name string `json:"name"`
+	Name string    `json:"name"`
+	Id   int       `json:"id"`
+	Time time.Time `json:"time"`
 }
+
+var startTime time.Time
+
+var timesArray [200]time.Time
 
 const qosClient = 1
 
 func main() {
-	startTime := time.Now()
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker("mqtt://localhost:1883")
 	opts.SetClientID("cliente")
@@ -46,8 +50,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	for i := 0; i < clientsQuant; i++ {
-		msg, err := json.Marshal(Message{Name: "sofia"})
+	for i := 0; i < 200; i++ {
+		timesArray[i] = time.Now()
+
+		msg, err := json.Marshal(Message{Name: "sofia", Id: i, Time: time.Now()})
 		failOnError(err, "Failed to parse the JSON message")
 
 		token := client.Publish("request", qosClient, false, msg)
@@ -56,24 +62,18 @@ func main() {
 			fmt.Println(token.Error())
 			os.Exit(1)
 		}
-		fmt.Printf("Mensagem Publicada: %s\n", msg)
-		time.Sleep(time.Second)
+		// fmt.Printf("Mensagem Publicada: %s\n", msg)
+		time.Sleep(time.Microsecond * time.Duration(50000))
 	}
-	elapsedTime := time.Now().Sub(startTime).Milliseconds()
-	fmt.Println(elapsedTime)
 }
 
 var receiveHandlerClient MQTT.MessageHandler = func(c MQTT.Client, m MQTT.Message) {
 	var response Message
+
 	err := json.Unmarshal(m.Payload(), &response)
 	failOnError(err, "Failed to decode the JSON message")
 
-	log.Printf("olá! seu nome ninja é 🌀%s🌀", response.Name)
-}
-
-var clientsQuant int
-
-func init() {
-	flag.IntVar(&clientsQuant, "clients", 1, "number of clients")
-	flag.Parse()
+	endTime := time.Now().Sub(response.Time).Nanoseconds()
+	fmt.Println(endTime)
+	// log.Printf("olá! seu nome ninja é 🌀%s🌀", response.Name)
 }
