@@ -22,7 +22,6 @@ type Message struct {
 }
 
 func main() {
-	startTime := time.Now()
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -52,9 +51,10 @@ func main() {
 		nil)
 	failOnError(err, "Failed to register a consumer")
 
-	for i := 0; i < clientsQuant; i++ {
+	for i := 0; i < 10000; i++ {
+		startTime := time.Now()
 		request := Message{
-			Name: "chico fumaca",
+			Name: "sofia",
 		}
 		requestJson, err := json.Marshal(request)
 		failOnError(err, "Failed to parse the JSON message")
@@ -79,11 +79,10 @@ func main() {
 		err = json.Unmarshal(m.Body, &reply)
 		failOnError(err, "Failed to decode the JSON message")
 
-		log.Printf("olá %s! seu nome ninja é 🌀%s🌀", request.Name, reply.Name)
+		// log.Printf("olá %s! seu nome ninja é 🌀%s🌀", request.Name, reply.Name)
+		elapsedTime := time.Now().Sub(startTime).Milliseconds()
+		fmt.Println(elapsedTime)
 	}
-
-	elapsedTime := time.Now().Sub(startTime).Milliseconds()
-	fmt.Println(elapsedTime)
 }
 
 var clientsQuant int
