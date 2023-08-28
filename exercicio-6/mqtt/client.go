@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
+
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -28,7 +30,9 @@ const qosClient = 1
 func main() {
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker("mqtt://localhost:1883")
-	opts.SetClientID("cliente")
+	var a = "cliente" + uuid.New().String()
+	fmt.Print(a)
+	opts.SetClientID(a)
 
 	client := MQTT.NewClient(opts)
 
