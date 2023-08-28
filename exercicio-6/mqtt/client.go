@@ -63,7 +63,7 @@ func main() {
 			os.Exit(1)
 		}
 		// fmt.Printf("Mensagem Publicada: %s\n", msg)
-		time.Sleep(time.Microsecond * time.Duration(50000))
+		time.Sleep(time.Second)
 	}
 }
 
