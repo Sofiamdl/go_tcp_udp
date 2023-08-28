@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -45,7 +46,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < clientsQuant; i++ {
 		msg, err := json.Marshal(Message{Name: "sofia"})
 		failOnError(err, "Failed to parse the JSON message")
 
@@ -68,4 +69,11 @@ var receiveHandlerClient MQTT.MessageHandler = func(c MQTT.Client, m MQTT.Messag
 	failOnError(err, "Failed to decode the JSON message")
 
 	log.Printf("olá! seu nome ninja é 🌀%s🌀", response.Name)
+}
+
+var clientsQuant int
+
+func init() {
+	flag.IntVar(&clientsQuant, "clients", 1, "number of clients")
+	flag.Parse()
 }
